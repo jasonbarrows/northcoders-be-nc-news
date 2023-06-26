@@ -25,4 +25,10 @@ describe('GET /api/topics', () => {
         });
       });
   });
+
+  it('404: responds with a 404 status for endpoints that do not exist on /api', () => {
+    return request(app)
+      .get('/api/bananas')
+      .expect(404);
+  });
 });
