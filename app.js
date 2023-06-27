@@ -1,15 +1,21 @@
 const express = require('express');
 const { getAllEndpoints } = require('./controllers/api.controllers');
-const { getAllTopics } = require('./controllers/topics.controller');
-const { getArticleById } = require('./controllers/articles.controller');
-const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require('./errors');
+const { getAllArticles, getArticleById } = require('./controllers/articles.controllers');
+const { getAllTopics } = require('./controllers/topics.controllers');
+const { handleCustomErrors, handlePsqlErrors, handleServerErrors } = require('./errors');
 
 const app = express();
 
 app.get('/api', getAllEndpoints);
+
+app.get('/api/articles', getAllArticles);
+app.get('/api/articles/:article_id', getArticleById);
+
 app.get('/api/topics', getAllTopics);
 
-app.get('/api/articles/:article_id', getArticleById);
+app.get('*', (_, res) => {
+  res.status(404).send({ message: 'Not Found' });
+})
 
 app.use(handlePsqlErrors);
 app.use(handleCustomErrors);
