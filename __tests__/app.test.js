@@ -65,6 +65,36 @@ describe('GET /api/topics', () => {
   });
 });
 
+describe('GET /api/articles', () => {
+  it('200: responds with all articles each of which include the required properties sorted by date in descending order', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body
+
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy('created_at', { descending: true });
+
+        articles.forEach((article) => {
+          expect(article.body).not.toBeDefined();
+
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+      });
+  });
+});
+
 describe('GET /api/articles/:article_id', () => {
   it('200: responds with an article object when given a valid article id', () => {
     return request(app)
