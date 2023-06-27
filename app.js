@@ -13,6 +13,10 @@ app.get('/api/articles/:article_id', getArticleById);
 
 app.get('/api/topics', getAllTopics);
 
+app.get('*', (_, res) => {
+  res.status(404).send({ message: 'Not Found' });
+})
+
 app.use(handlePsqlErrors);
 app.use(handleCustomErrors);
 app.use(handleServerErrors);

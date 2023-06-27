@@ -7,6 +7,17 @@ const app = require('../app');
 beforeEach(() => seed(data));
 afterAll(() => db.end());
 
+describe('ALL non-existent paths', () => {
+  it('404: should return a custom error message when the route does not exist', () => {
+    return request(app)
+      .get('/api/not-a-valid-route')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not Found');
+      });
+  });
+});
+
 describe('GET /api', () => {
   it('200: responds with an object describing all available endpoints', () => {
     return request(app)
@@ -31,12 +42,6 @@ describe('GET /api', () => {
         });
       });
   });
-
-  it('404: responds with a 404 status for endpoints that do not exist on /', () => {
-    return request(app)
-      .get('/banana')
-      .expect(404);
-  });
 });
 
 describe('GET /api/topics', () => {
@@ -56,12 +61,6 @@ describe('GET /api/topics', () => {
           });
         });
       });
-  });
-
-  it('404: responds with a 404 status for endpoints that do not exist on /api', () => {
-    return request(app)
-      .get('/api/bananas')
-      .expect(404);
   });
 });
 
