@@ -1,7 +1,7 @@
 const express = require('express');
 const { getAllEndpoints } = require('./controllers/api.controllers');
 const { getAllTopics } = require('./controllers/topics.controllers');
-const { getArticleById } = require('./controllers/articles.controller');
+const { getArticleById } = require('./controllers/articles.controllers');
 const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require('./errors');
 
 const app = express();
