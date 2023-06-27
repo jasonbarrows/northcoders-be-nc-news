@@ -163,6 +163,7 @@ describe('GET /api/articles/:article_id/comments', () => {
       .then(({ body }) => {
         const { comments } = body;
 
+        expect(comments).toBeInstanceOf(Array);
         expect(comments).toHaveLength(0);
       });
   });
