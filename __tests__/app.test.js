@@ -132,3 +132,56 @@ describe('GET /api/articles/:article_id', () => {
       });
   });
 });
+
+describe('GET /api/articles/:article_id/comments', () => {
+  it('200: responds with all comments when given a valid article id', () => {
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+      });
+  });
+
+  it('200: responds with an empty array if the article id exists but has no comments', () => {
+    return request(app)
+      .get('/api/articles/2/comments')
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+
+        expect(comments).toHaveLength(0);
+      });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    return request(app)
+      .get('/api/articles/9999/comments')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not Found');
+      });
+  });
+
+  it('400: responds with bad request when given an invalid article id', () => {
+    return request(app)
+      .get('/api/articles/not-an-article-id/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+});

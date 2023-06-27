@@ -22,3 +22,17 @@ exports.selectArticleById = (article_id) => {
     return rows[0];
   });
 };
+
+exports.selectAllCommentsByArticleId = (article_id) => {
+  return Promise.all([
+    db.query(
+      `SELECT c.* FROM comments c
+      JOIN articles a ON a.article_id = c.article_id
+      WHERE a.article_id = $1;`
+      , [ article_id ]
+    ),
+    this.selectArticleById(article_id),
+  ]).then(([result]) => {
+    return result.rows;
+  });
+};
