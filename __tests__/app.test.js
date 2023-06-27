@@ -37,7 +37,8 @@ describe('GET /api', () => {
 
           const verb = key.split(' ')[0];
           if (['POST', 'PUT', 'PATCH'].includes(verb)) {
-            expect(endpoint.requestBodyFormat).toBe(expect.any(Object));
+            expect(endpoint.requestBodyFormat).not.toEqual(expect.any(Array));
+            expect(endpoint.requestBodyFormat).toEqual(expect.any(Object));
           }
         });
       });
