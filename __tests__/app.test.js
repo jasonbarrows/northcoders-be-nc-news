@@ -189,7 +189,7 @@ describe('GET /api/articles/:article_id/comments', () => {
 });
 
 describe('POST /api/articles/:article_id/comments', () => {
-  it('200: creates a new comment for a valid article id and responds with the new comment object', () => {
+  it('201: creates a new comment for a valid article id and responds with the new comment object', () => {
     const testNewComment = {
       username: 'butter_bridge',
       body: 'This is a test comment body.',
