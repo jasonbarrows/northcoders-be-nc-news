@@ -37,7 +37,8 @@ describe('GET /api', () => {
 
           const verb = key.split(' ')[0];
           if (['POST', 'PUT', 'PATCH'].includes(verb)) {
-            expect(endpoint.requestBodyFormat).toBe(expect.any(Object));
+            expect(endpoint.requestBodyFormat).not.toEqual(expect.any(Array));
+            expect(endpoint.requestBodyFormat).toEqual(expect.any(Object));
           }
         });
       });
@@ -163,6 +164,7 @@ describe('GET /api/articles/:article_id/comments', () => {
       .then(({ body }) => {
         const { comments } = body;
 
+        expect(comments).toBeInstanceOf(Array);
         expect(comments).toHaveLength(0);
       });
   });
@@ -179,6 +181,125 @@ describe('GET /api/articles/:article_id/comments', () => {
   it('400: responds with bad request when given an invalid article id', () => {
     return request(app)
       .get('/api/articles/not-an-article-id/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+});
+
+describe('POST /api/articles/:article_id/comments', () => {
+  it('201: creates a new comment for a valid article id and responds with the new comment object', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: expect.any(String),
+          article_id: expect.any(Number),
+          author: expect.any(String),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+        });
+      });
+  });
+
+  it('201: ignores additional properties passed in the request body', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+      votes: 100,
+      foo: 'bar',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+
+        expect(comment.votes).not.toBe(100);
+        expect(comment).not.toHaveProperty('foo');
+      });
+  });
+
+  it('400: a username is required in the request body', () => {
+    const testNewComment = {
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+
+  it('400: a username must belong to a valid user', () => {
+    const testNewComment = {
+      username: 'john',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+
+  it('400: a body is required in the request body', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/9999/comments')
+      .send(testNewComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not Found');
+      });
+  });
+
+  it('400: responds with bad request when given an invalid article id', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/not-an-article-id/comments')
+      .send(testNewComment)
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad Request');
