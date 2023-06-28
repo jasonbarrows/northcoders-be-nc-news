@@ -233,7 +233,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('400: a username is required in the request body', () => {
+  it('400: a username property is required in the request body', () => {
     const testNewComment = {
       body: 'This is a test comment body.',
     };
@@ -262,7 +262,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('400: a body is required in the request body', () => {
+  it('400: a body property is required in the request body', () => {
     const testNewComment = {
       username: 'butter_bridge',
     };
@@ -304,5 +304,98 @@ describe('POST /api/articles/:article_id/comments', () => {
       .then(({ body }) => {
         expect(body.message).toBe('Bad Request');
       });
+  });
+});
+
+describe('PATCH /api/articles/:article_id', () => {
+  it('200: should increment an article\'s votes count by a positive inc_votes property for a valid article id and responds with the updated article', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/articles/1')
+      .send(testBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+
+        expect(article.votes).toBe(101);
+      });
+  });
+
+  it('200: should decrement an article\'s votes count by a negative inc_votes property for a valid article id and responds with the updated article', () => {
+    const testBody = { inc_votes: -87 };
+
+    return request(app)
+      .patch('/api/articles/1')
+      .send(testBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+
+        expect(article.votes).toBe(13);
+      });
+  });
+
+  it('200: ignores additional properties passed in the request body ', () => {
+    const testBody = {
+      inc_votes: 1,
+      body: 'New test body',
+    };
+
+    return request(app)
+      .patch('/api/articles/1')
+      .send(testBody)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article.body).not.toBe(testBody.body);
+      });
+  });
+
+  it('400: a inc_votes property is required in the request body', () => {
+    const testBody = {};
+
+    return request(app)
+      .patch('/api/articles/1')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+
+  it('400: responds with bad request when inc_votes is not an integer', () => {
+    const testBody = { inc_votes: 'not-an-integer' };
+
+    return request(app)
+    .patch('/api/articles/1')
+    .send(testBody)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe('Bad Request');
+    });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/articles/9999')
+      .send(testBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not Found');
+      });
+  });
+
+  it('400: responds with bad request when given an invalid article id', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+    .patch('/api/articles/not-an-article-id')
+    .send(testBody)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe('Bad Request');
+    });
   });
 });
