@@ -227,6 +227,21 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
+  it('400: a username must belong to a valid user', () => {
+    const testNewComment = {
+      username: 'john',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+
   it('400: a body is required in the request body', () => {
     const testNewComment = {
       username: 'butter_bridge',
