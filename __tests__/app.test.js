@@ -233,7 +233,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('400: a username is required in the request body', () => {
+  it('400: a username property is required in the request body', () => {
     const testNewComment = {
       body: 'This is a test comment body.',
     };
@@ -262,7 +262,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('400: a body is required in the request body', () => {
+  it('400: a body property is required in the request body', () => {
     const testNewComment = {
       username: 'butter_bridge',
     };
