@@ -1,21 +1,6 @@
 const { selectAllCommentsByArticleId } = require("../models/articles.models");
 const { insertCommentByArticleId } = require("../models/comments.models");
 
-const validateRequestBody = (body, rules) => {
-  const result = {};
-
-  for (const key in rules) {
-    const isRequired = !body[key] === rules[key].required;
-    const notMatchesType = typeof body[key] !== rules[key].type;
-
-    if (isRequired && notMatchesType) return false;
-
-    result[key] = body[key];
-  }
-
-  return result;
-};
-
 exports.getAllCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
 
@@ -26,17 +11,9 @@ exports.getAllCommentsByArticleId = (req, res, next) => {
 
 exports.createCommentbyArticleId = (req, res, next) => {
   const { article_id } = req.params;
+  const comment = req.body;
 
-  const validated = validateRequestBody(req.body, {
-    username: { required: true, type: 'string'},
-    body: { required: true, type: 'string'},
-  });
-
-  if (validated) {
-    insertCommentByArticleId(article_id, validated).then((insertedComment) => {
-      res.status(201).send({ comment: insertedComment });
-    }).catch(next);
-  } else {
-    res.status(400).send({ message: 'Bad Request' });
-  }
+  insertCommentByArticleId(article_id, comment).then((insertedComment) => {
+    res.status(201).send({ comment: insertedComment });
+  }).catch(next);
 };
