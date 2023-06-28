@@ -213,6 +213,26 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
+  it('201: ignores additional properties passed in the request body', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+      votes: 100,
+      foo: 'bar',
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(testNewComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+
+        expect(comment.votes).not.toBe(100);
+        expect(comment).not.toHaveProperty('foo');
+      });
+  });
+
   it('400: a username is required in the request body', () => {
     const testNewComment = {
       body: 'This is a test comment body.',
