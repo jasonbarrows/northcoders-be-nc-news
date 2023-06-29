@@ -200,6 +200,17 @@ describe('GET /api/articles/:article_id', () => {
       });
   });
 
+  it('200: articles should also include a comment_count property', () => {
+    return request(app)
+      .get('/api/articles/2')
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+
+        expect(article.comment_count).toEqual(expect.any(Number));
+      });
+  });
+
   it('404: responds with not found message when given a valid article id that does not exist', () => {
     return request(app)
       .get('/api/articles/9999')
