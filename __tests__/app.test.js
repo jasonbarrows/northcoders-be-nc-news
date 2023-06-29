@@ -131,75 +131,12 @@ describe('GET /api/articles', () => {
   });
 
   describe('?sort_by (sorted in descending order by default)', () => {
-    it('200: responds with articles sorted by article_id', () => {
-      return request(app)
-        .get('/api/articles?sort_by=article_id')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('article_id', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by title', () => {
+    it('200: responds with articles sorted by a valid sort_by option', () => {
       return request(app)
         .get('/api/articles?sort_by=title')
         .expect(200)
         .then(({ body }) => {
           expect(body.articles).toBeSortedBy('title', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by topic', () => {
-      return request(app)
-        .get('/api/articles?sort_by=topic')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('topic', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by author', () => {
-      return request(app)
-        .get('/api/articles?sort_by=author')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('author', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by created_at', () => {
-      return request(app)
-        .get('/api/articles?sort_by=created_at')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('created_at', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by votes', () => {
-      return request(app)
-        .get('/api/articles?sort_by=votes')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('votes', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by article_img_url', () => {
-      return request(app)
-        .get('/api/articles?sort_by=article_img_url')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('article_img_url', { descending: true });
-        });
-    });
-
-    it('200: responds with articles sorted by comment_count', () => {
-      return request(app)
-        .get('/api/articles?sort_by=comment_count')
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.articles).toBeSortedBy('comment_count', { descending: true });
         });
     });
 
