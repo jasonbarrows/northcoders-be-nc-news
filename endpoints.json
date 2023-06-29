@@ -120,5 +120,14 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a user with the provided username",
+    "queries": [],
+    "exampleResponse": {
+      "username": "weegembump",
+      "name": "Gemma Bump",
+      "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/7e/MrMen-Bump.png/revision/latest?cb=20180123225553"
+    }
   }
 }
