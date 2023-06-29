@@ -17,7 +17,7 @@ exports.selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
     return Promise.reject({ status: 400, message: 'Invalid sort_by query' });
   }
 
-  if (!['asc', 'desc'].includes(order)) {
+  if (!['asc', 'desc'].includes(order.toLowerCase())) {
     return Promise.reject({ status: 400, message: 'Invalid order query' });
   }
 
@@ -32,7 +32,7 @@ exports.selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
     queryStr += `WHERE topic = $${queryValues.length} `;
   }
 
-  queryStr += `GROUP BY a.article_id ORDER BY ${sort_by} ${order};`;
+  queryStr += `GROUP BY a.article_id ORDER BY ${sort_by} ${order.toUpperCase()};`;
 
   const promises = [
     db.query(queryStr, queryValues),

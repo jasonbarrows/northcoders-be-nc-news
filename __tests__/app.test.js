@@ -223,9 +223,9 @@ describe('GET /api/articles', () => {
         });
     });
 
-    it('200: responds with articles sorted in descending order when order is desc', () => {
+    it('200: responds with articles sorted in descending order when order is DESC', () => {
       return request(app)
-        .get('/api/articles?order=desc')
+        .get('/api/articles?order=DESC')
         .expect(200)
         .then(({ body }) => {
           expect(body.articles).toBeSortedBy('created_at', { descending: true });
