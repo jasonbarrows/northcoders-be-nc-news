@@ -25,7 +25,7 @@ app.get('/api/topics', getAllTopics);
 app.get('/api/users', getAllUsers);
 
 app.get('*', (_, res) => {
-  res.status(404).send({ message: 'Not Found' });
+  res.status(404).send({ message: 'Not found' });
 })
 
 app.use(handlePsqlErrors);

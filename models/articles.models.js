@@ -57,7 +57,7 @@ exports.selectArticleById = (article_id) => {
     article_id
   ]).then(({ rows }) => {
     if (rows.length === 0) {
-      return Promise.reject({ status: 404, message: 'Not Found' });
+      return Promise.reject({ status: 404, message: 'Not found' });
     }
     return rows[0];
   });
@@ -89,7 +89,7 @@ exports.updateArticleById = (article_id, { inc_votes }) => {
     ]
   ).then(({ rows }) => {
     if (rows.length === 0) {
-      return Promise.reject({ status: 404, message: 'Not Found'});
+      return Promise.reject({ status: 404, message: 'Not found'});
     }
     return rows[0];
   });

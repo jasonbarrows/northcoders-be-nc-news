@@ -29,7 +29,7 @@ exports.deleteCommentById = (comment_id) => {
     ]
   ).then(({ rows }) => {
     if (rows.length === 0) {
-      return Promise.reject({ status: 404, message: 'Not Found' });
+      return Promise.reject({ status: 404, message: 'Not found' });
     }
   });
 };

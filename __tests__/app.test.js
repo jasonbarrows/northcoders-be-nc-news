@@ -13,7 +13,7 @@ describe('ALL non-existent paths', () => {
       .get('/api/not-a-valid-route')
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe('Not Found');
+        expect(body.message).toBe('Not found');
       });
   });
 });
@@ -216,7 +216,7 @@ describe('GET /api/articles/:article_id', () => {
       .get('/api/articles/9999')
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe('Not Found');
+        expect(body.message).toBe('Not found');
       });
   });
 
@@ -270,7 +270,7 @@ describe('GET /api/articles/:article_id/comments', () => {
       .get('/api/articles/9999/comments')
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe('Not Found');
+        expect(body.message).toBe('Not found');
       });
   });
 
@@ -383,7 +383,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       .send(testNewComment)
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe('Not Found');
+        expect(body.message).toBe('Not found');
       });
   });
 
@@ -479,7 +479,7 @@ describe('PATCH /api/articles/:article_id', () => {
       .send(testBody)
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe('Not Found');
+        expect(body.message).toBe('Not found');
       });
   });
 
@@ -508,7 +508,7 @@ describe('DELETE /api/comments/:comment_id', () => {
       .delete('/api/comments/999')
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe('Not Found');
+        expect(body.message).toBe('Not found');
       });
   });
 
