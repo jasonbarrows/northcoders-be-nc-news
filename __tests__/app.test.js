@@ -542,3 +542,29 @@ describe('GET /api/users', () => {
       });
   });
 });
+
+describe('GET /api/users/:username', () => {
+  it('200: responds with a user object when given a valid username', () => {
+    return request(app)
+      .get('/api/users/butter_bridge')
+      .expect(200)
+      .then(({ body }) => {
+        const { user } = body;
+
+        expect(user).toMatchObject({
+          username: expect.any(String),
+          name: expect.any(String),
+          avatar_url: expect.any(String),
+        });
+      });
+  });
+
+  it('404: responds with not found message when given a username that does not exist', () => {
+    return request(app)
+      .get('/api/users/unknown-user')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
+  });
+});
