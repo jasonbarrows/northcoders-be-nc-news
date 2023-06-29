@@ -45,7 +45,8 @@
         "created_at": "2018-05-30T15:59:13.341Z",
         "votes": 0,
         "article_img_url":
-          "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?w=700&h=700"
+          "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?w=700&h=700",
+        "comment_count": 6
       }
     }
   },

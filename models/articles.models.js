@@ -13,7 +13,12 @@ exports.selectAllArticles = () => {
 };
 
 exports.selectArticleById = (article_id) => {
-  return db.query(`SELECT * FROM articles WHERE article_id = $1;`, [
+  return db.query(
+    `SELECT a.*, CAST (COUNT (c.comment_id) AS INTEGER) AS comment_count
+    FROM articles a
+    LEFT JOIN comments c ON c.article_id = a.article_id
+    WHERE a.article_id = $1
+    GROUP BY a.article_id;`, [
     article_id
   ]).then(({ rows }) => {
     if (rows.length === 0) {
