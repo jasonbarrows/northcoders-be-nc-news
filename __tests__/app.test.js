@@ -102,6 +102,7 @@ describe('GET /api/articles', () => {
         .then(({ body }) => {
           const { articles } = body
 
+          expect(articles).toHaveLength(12);
           articles.forEach((article) => {
             expect(article.topic).toBe('mitch');
           });
