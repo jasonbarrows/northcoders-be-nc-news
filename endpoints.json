@@ -106,5 +106,18 @@
     "description": "deletes a comment with the provided comment id",
     "queries": [],
     "exampleResponse": null
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "author": "weegembump",
+          "name": "Gemma Bump",
+          "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/7/7e/MrMen-Bump.png/revision/latest?cb=20180123225553"
+        }
+      ]
+    }
   }
 }
