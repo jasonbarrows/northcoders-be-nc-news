@@ -1,14 +1,49 @@
 const db = require('../db/connection');
+const { checkTopicSlugExists } = require('./topics.models');
 
-exports.selectAllArticles = () => {
-  return db.query(
+exports.selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
+  const validSortByOptions = [
+    'article_id',
+    'title',
+    'topic',
+    'author',
+    'created_at',
+    'votes',
+    'article_img_url',
+    'comment_count'
+  ];
+
+  if (!validSortByOptions.includes(sort_by)) {
+    return Promise.reject({ status: 400, message: 'Invalid sort_by query' });
+  }
+
+  if (!['asc', 'desc'].includes(order.toLowerCase())) {
+    return Promise.reject({ status: 400, message: 'Invalid order query' });
+  }
+
+  const queryValues = [];
+  let queryStr =
     `SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, CAST (COUNT (c.comment_id) AS INTEGER) AS comment_count
     FROM articles a
-    LEFT JOIN comments c ON c.article_id = a.article_id
-    GROUP BY a.article_id
-    ORDER BY created_at DESC;`
-  ).then(({ rows }) => {
-    return rows;
+    LEFT JOIN comments c ON c.article_id = a.article_id `;
+
+  if (topic) {
+    queryValues.push(topic);
+    queryStr += `WHERE topic = $${queryValues.length} `;
+  }
+
+  queryStr += `GROUP BY a.article_id ORDER BY ${sort_by} ${order.toUpperCase()};`;
+
+  const promises = [
+    db.query(queryStr, queryValues),
+  ];
+
+  if (topic) {
+    promises.push(checkTopicSlugExists(topic));
+  }
+
+  return Promise.all(promises).then(([result]) => {
+    return result.rows
   });
 };
 
