@@ -4,6 +4,7 @@ const { getAllArticles, getArticleById, editArticleById } = require('./controlle
 const { getAllCommentsByArticleId, createCommentbyArticleId } = require('./controllers/article-comments.controllers');
 const { destroyCommentById } = require('./controllers/comments.controllers');
 const { getAllTopics } = require('./controllers/topics.controllers');
+const { getAllUsers } = require('./controllers/users.controllers');
 const { handleCustomErrors, handlePsqlErrors, handleServerErrors } = require('./errors');
 
 const app = express();
@@ -20,6 +21,8 @@ app.post('/api/articles/:article_id/comments', express.json(), createCommentbyAr
 app.delete('/api/comments/:comment_id', destroyCommentById);
 
 app.get('/api/topics', getAllTopics);
+
+app.get('/api/users', getAllUsers);
 
 app.get('*', (_, res) => {
   res.status(404).send({ message: 'Not Found' });
