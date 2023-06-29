@@ -496,6 +496,100 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
+describe('PATCH /api/comments/:comment_id', () => {
+  it("200: should increment a comment's votes by a positive inc_votes value for a valid comment id and responds with the updated comment", () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/comments/1')
+      .send(testBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+
+        expect(comment.votes).toBe(17);
+      })
+  });
+
+  it("200: should decrement a comment's votes by a negative inc_votes value for a valid comment id and responds with the updated comment", () => {
+    const testBody = { inc_votes: -1 };
+
+    return request(app)
+      .patch('/api/comments/1')
+      .send(testBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+
+        expect(comment.votes).toBe(15);
+      })
+  });
+
+  it('200: ignores additional properties passed in the request body ', () => {
+    const testBody = {
+      inc_votes: 1,
+      body: 'New test body',
+    };
+
+    return request(app)
+      .patch('/api/comments/1')
+      .send(testBody)
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body
+        expect(comment.body).not.toBe(testBody.body);
+      });
+  });
+
+  it('400: an inc_votes property is required in the request body', () => {
+    const testBody = {};
+
+    return request(app)
+      .patch('/api/comments/1')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad Request');
+      });
+  });
+
+  it('400: responds with bad request when inc_votes is not an integer', () => {
+    const testBody = { inc_votes: 'not-an-integer' };
+
+    return request(app)
+    .patch('/api/comments/1')
+    .send(testBody)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe('Bad Request');
+    });
+  });
+
+  it('404: responds with not found when given a valid comment id that does not exist', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/comments/9999')
+      .send(testBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
+  });
+
+  it('400: responds with bad request when given an invalid comment id', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+    .patch('/api/comments/not-an-comment-id')
+    .send(testBody)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe('Bad Request');
+    });
+  });
+});
+
 describe('DELETE /api/comments/:comment_id', () => {
   it('204: should delete the comment with the given comment id', () => {
     return request(app)
