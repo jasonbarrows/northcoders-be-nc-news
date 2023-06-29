@@ -57,7 +57,7 @@
       "inc_votes": 1
     },
     "exampleResponse": {
-      "comment": {
+      "article": {
         "article_id": 1,
         "title": "Seafood substitutions are increasing",
         "topic": "cooking",
