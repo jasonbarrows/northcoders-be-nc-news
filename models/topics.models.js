@@ -11,7 +11,7 @@ exports.selectAllTopics = () => {
 exports.checkTopicSlugExists = (topic) => {
   return db.query(
     `SELECT * FROM topics
-    WHERE slug = $1`, [
+    WHERE slug = $1;`, [
       topic
     ]
   ).then(({ rows }) => {

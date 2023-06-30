@@ -1,4 +1,4 @@
-const { selectAllArticles, selectArticleById, updateArticleById } = require("../models/articles.models");
+const { selectAllArticles, selectArticleById, updateArticleById, insertArticle } = require("../models/articles.models");
 
 exports.getAllArticles = (req, res, next) => {
   const { topic, sort_by, order } = req.query;
@@ -13,6 +13,12 @@ exports.getArticleById = (req, res, next) => {
 
   selectArticleById(article_id).then((article) => {
     res.status(200).send({ article });
+  }).catch(next);
+};
+
+exports.createArticle = (req, res, next) => {
+  insertArticle(req.body).then((article) => {
+    res.status(201).send({ article });
   }).catch(next);
 };
 

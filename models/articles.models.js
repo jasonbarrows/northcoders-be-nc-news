@@ -1,3 +1,4 @@
+const format = require('pg-format');
 const db = require('../db/connection');
 const { checkTopicSlugExists } = require('./topics.models');
 
@@ -78,12 +79,42 @@ exports.selectAllCommentsByArticleId = (article_id) => {
   });
 };
 
+exports.insertArticle = (body) => {
+  const preparedArticle = {
+    title: body.title,
+    topic: body.topic,
+    author: body.author,
+    body: body.body,
+  };
+
+  if (body.article_img_url) {
+    preparedArticle.article_img_url = body.article_img_url;
+  }
+
+  const keys = Object.keys(preparedArticle).map(key => {
+    return format('%I', key);
+  }).join(', ');
+
+  const values = Object.values(preparedArticle).map(value => {
+    return format('%L', value);
+  }).join(', ');
+
+  return db.query(format(
+    `INSERT INTO articles (%s) VALUES (%s)
+    RETURNING *, 0 AS comment_count;`,
+    keys,
+    values
+  )).then(({ rows }) => {
+    return rows[0];
+  });
+};
+
 exports.updateArticleById = (article_id, { inc_votes }) => {
   return db.query(
     `UPDATE articles
     SET votes = votes + $1
     WHERE article_id = $2
-    RETURNING *`, [
+    RETURNING *;`, [
       inc_votes,
       article_id,
     ]
