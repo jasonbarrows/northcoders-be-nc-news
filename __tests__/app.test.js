@@ -469,21 +469,21 @@ describe('GET /api/articles/:article_id', () => {
       });
   });
 
-  it('404: responds with not found message when given a valid article id that does not exist', () => {
-    return request(app)
-      .get('/api/articles/9999')
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request message when given an invalid article id', () => {
     return request(app)
       .get('/api/articles/not-an-article-id')
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: responds with not found message when given a valid article id that does not exist', () => {
+    return request(app)
+      .get('/api/articles/9999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
       });
   });
 });
@@ -523,21 +523,21 @@ describe('GET /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('404: responds with not found when given a valid article id that does not exist', () => {
-    return request(app)
-      .get('/api/articles/9999/comments')
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid article id', () => {
     return request(app)
       .get('/api/articles/not-an-article-id/comments')
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    return request(app)
+      .get('/api/articles/9999/comments')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
       });
   });
 });
@@ -630,21 +630,6 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('404: responds with not found when given a valid article id that does not exist', () => {
-    const testNewComment = {
-      username: 'butter_bridge',
-      body: 'This is a test comment body.',
-    };
-
-    return request(app)
-      .post('/api/articles/9999/comments')
-      .send(testNewComment)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid article id', () => {
     const testNewComment = {
       username: 'butter_bridge',
@@ -657,6 +642,21 @@ describe('POST /api/articles/:article_id/comments', () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/9999/comments')
+      .send(testNewComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
       });
   });
 });
@@ -729,18 +729,6 @@ describe('PATCH /api/articles/:article_id', () => {
     });
   });
 
-  it('404: responds with not found when given a valid article id that does not exist', () => {
-    const testBody = { inc_votes: 1 };
-
-    return request(app)
-      .patch('/api/articles/9999')
-      .send(testBody)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid article id', () => {
     const testBody = { inc_votes: 1 };
 
@@ -751,6 +739,18 @@ describe('PATCH /api/articles/:article_id', () => {
     .then(({ body }) => {
       expect(body.message).toBe('Bad request');
     });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/articles/9999')
+      .send(testBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
   });
 });
 
@@ -823,18 +823,6 @@ describe('PATCH /api/comments/:comment_id', () => {
     });
   });
 
-  it('404: responds with not found when given a valid comment id that does not exist', () => {
-    const testBody = { inc_votes: 1 };
-
-    return request(app)
-      .patch('/api/comments/9999')
-      .send(testBody)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid comment id', () => {
     const testBody = { inc_votes: 1 };
 
@@ -846,6 +834,18 @@ describe('PATCH /api/comments/:comment_id', () => {
       expect(body.message).toBe('Bad request');
     });
   });
+
+  it('404: responds with not found when given a valid comment id that does not exist', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/comments/9999')
+      .send(testBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
+  });
 });
 
 describe('DELETE /api/comments/:comment_id', () => {
@@ -855,21 +855,21 @@ describe('DELETE /api/comments/:comment_id', () => {
       .expect(204);
   });
 
-  it('404: should return not found if the comment id is valid but does not exist', () => {
-    return request(app)
-      .delete('/api/comments/999')
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: should return bad request when given an invalid comment id', () => {
     return request(app)
       .delete('/api/comments/not-a-valid-id')
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: should return not found if the comment id is valid but does not exist', () => {
+    return request(app)
+      .delete('/api/comments/999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
       });
   });
 });
