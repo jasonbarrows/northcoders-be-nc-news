@@ -45,26 +45,6 @@ describe('GET /api', () => {
   });
 });
 
-describe('GET /api/topics', () => {
-  it('200: responds with all topics including slug and description properties', () => {
-    return request(app)
-      .get('/api/topics')
-      .expect(200)
-      .then(({ body }) => {
-        const { topics } = body;
-
-        expect(topics).toBeInstanceOf(Array);
-        expect(topics).toHaveLength(3);
-        topics.forEach((topic) => {
-          expect(topic).toMatchObject({
-            slug: expect.any(String),
-            description: expect.any(String),
-          });
-        });
-      });
-  });
-});
-
 describe('GET /api/articles', () => {
   it('200: responds with all articles each of which include the required properties sorted by date in descending order', () => {
     return request(app)
@@ -954,6 +934,91 @@ describe('DELETE /api/comments/:comment_id', () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe('Not found');
+      });
+  });
+});
+
+describe('GET /api/topics', () => {
+  it('200: responds with all topics including slug and description properties', () => {
+    return request(app)
+      .get('/api/topics')
+      .expect(200)
+      .then(({ body }) => {
+        const { topics } = body;
+
+        expect(topics).toBeInstanceOf(Array);
+        expect(topics).toHaveLength(3);
+        topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String),
+          });
+        });
+      });
+  });
+});
+
+describe('POST /api/topics', () => {
+  it('200: creates a new topic and responds with the new topic object', () => {
+    const testBody = {
+      slug: 'new-topic',
+      description: 'New topic description',
+    };
+
+    return request(app)
+      .post('/api/topics')
+      .send(testBody)
+      .expect(201)
+      .then(({ body }) => {
+        const newTopic = body.topic;
+        expect(newTopic).toEqual(testBody);
+      });
+  });
+
+  it('200: a description property is optional', () => {
+    const testBody = {
+      slug: 'new-topic',
+      description: 'New topic description',
+    };
+
+    return request(app)
+      .post('/api/topics')
+      .send(testBody)
+      .expect(201)
+      .then(({ body }) => {
+        const newTopic = body.topic;
+        expect(newTopic).toEqual(testBody);
+      });
+  });
+
+  it('201: ignores additional properties passed in the request body', () => {
+    const testBody = {
+      slug: 'new-topic',
+      description: 'New topic description',
+      foo: 'bar',
+    };
+
+    return request(app)
+      .post('/api/topics')
+      .send(testBody)
+      .expect(201)
+      .then(({ body }) => {
+        const newTopic = body.topic;
+        expect(newTopic).not.toHaveProperty('foo');
+      });
+  });
+
+  it('400: a slug property is required', () => {
+    const testBody = {
+      description: 'New topic description',
+    };
+
+    return request(app)
+      .post('/api/topics')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
       });
   });
 });
