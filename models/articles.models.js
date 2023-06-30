@@ -2,7 +2,16 @@ const format = require('pg-format');
 const db = require('../db/connection');
 const { checkTopicSlugExists } = require('./topics.models');
 
-exports.selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
+exports.selectAllArticles = ({
+  topic,
+  sort_by = 'created_at',
+  order = 'desc',
+  limit = 10,
+  p: page,
+  total_count
+}) => {
+  // if (limit === '') limit = 10;
+
   const validSortByOptions = [
     'article_id',
     'title',
@@ -22,18 +31,38 @@ exports.selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
     return Promise.reject({ status: 400, message: 'Invalid order query' });
   }
 
+  if (limit % 1 !== 0) {
+    return Promise.reject({ status: 400, message: 'Invalid limit query' });
+  }
+
   const queryValues = [];
-  let queryStr =
-    `SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, CAST (COUNT (c.comment_id) AS INTEGER) AS comment_count
-    FROM articles a
-    LEFT JOIN comments c ON c.article_id = a.article_id `;
+
+  let queryStr = `SELECT a.article_id, a.title, a.topic, a.author, a.created_at, a.votes, a.article_img_url, CAST (COUNT (c.comment_id) AS INTEGER) AS comment_count`;
+
+  if (total_count === '') {
+    queryStr += `, CAST (count(a.article_id) OVER() AS INTEGER) AS total_count`;
+  }
+
+  queryStr += ` FROM articles a LEFT JOIN comments c ON c.article_id = a.article_id`;
 
   if (topic) {
     queryValues.push(topic);
-    queryStr += `WHERE topic = $${queryValues.length} `;
+    queryStr += ` WHERE topic = $${queryValues.length}`;
   }
 
-  queryStr += `GROUP BY a.article_id ORDER BY ${sort_by} ${order.toUpperCase()};`;
+  queryStr += ` GROUP BY a.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`;
+
+  if (limit) {
+    queryValues.push(limit);
+    queryStr += ` LIMIT $${queryValues.length}`;
+  }
+
+  if (page) {
+    queryValues.push((page - 1) * limit);
+    queryStr += ` OFFSET $${queryValues.length}`;
+  }
+
+  queryStr += ';';
 
   const promises = [
     db.query(queryStr, queryValues),
@@ -43,8 +72,12 @@ exports.selectAllArticles = (topic, sort_by = 'created_at', order = 'desc') => {
     promises.push(checkTopicSlugExists(topic));
   }
 
-  return Promise.all(promises).then(([result]) => {
-    return result.rows
+  return Promise.all(promises).then((result) => {
+    if (result.length === 1 && result[0].rows.length === 0) {
+      return Promise.reject({ status: 404, message: 'Not found'});
+    }
+
+    return result[0].rows
   });
 };
 

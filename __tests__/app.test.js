@@ -74,7 +74,7 @@ describe('GET /api/articles', () => {
         const { articles } = response.body
 
         expect(articles).toBeInstanceOf(Array);
-        expect(articles).toHaveLength(13);
+        expect(articles.length).toBeGreaterThan(1);
         expect(articles).toBeSortedBy('created_at', { descending: true });
 
         articles.forEach((article) => {
@@ -102,7 +102,7 @@ describe('GET /api/articles', () => {
         .then(({ body }) => {
           const { articles } = body
 
-          expect(articles).toHaveLength(12);
+          expect(articles.length).toBeGreaterThan(1);
           articles.forEach((article) => {
             expect(article.topic).toBe('mitch');
           });
@@ -175,6 +175,96 @@ describe('GET /api/articles', () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe('Invalid order query');
+        });
+    });
+  });
+
+  describe('?limit', () => {
+    it('200: responds with an array of articles limited to the length of limit', () => {
+      return request(app)
+        .get('/api/articles?limit=5')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(5);
+        });
+    });
+
+    it('200: responds with an array of 10 articles by default when not specifically assigned a value', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(10);
+        });
+    });
+
+    it('400: responds with invalid limit query for an invalid limit query', () => {
+      return request(app)
+        .get('/api/articles?limit=not-an-integer')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe('Invalid limit query');
+        });
+    });
+  });
+
+  describe('?p', () => {
+    it('200: responds with an array of articles starting at page 1 of n pages', () => {
+      return request(app)
+        .get('/api/articles?p=1&sort_by=article_id&order=ASC')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(10);
+
+          const articleIds = articles.map((article) => article.article_id)
+          expect(articleIds).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        });
+    });
+
+    it('200: responds with an array of articles starting at page 2 of n pages', () => {
+      return request(app)
+        .get('/api/articles?p=2&sort_by=article_id&order=ASC')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(3);
+
+          const articleIds = articles.map((article) => article.article_id)
+          expect(articleIds).toEqual([11, 12, 13]);
+        });
+    });
+
+    it('400: responds with bad request when page is not a number', () => {
+      return request(app)
+        .get('/api/articles?p=banana')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe('Bad request');
+        });
+    });
+
+    it('404: responds with not found when page is out of bounds', () => {
+      return request(app)
+        .get('/api/articles?p=99')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).toBe('Not found');
+        });
+    });
+  });
+
+  describe('?total_count', () => {
+    it('200: it includes a total_count property displaying the total number of articles including any filters applied but discounting the limit', () => {
+      return request(app)
+        .get('/api/articles?total_count')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles, total_count } = body;
+          expect(articles).toHaveLength(10);
+          expect(total_count).toBe(13);
         });
     });
   });
