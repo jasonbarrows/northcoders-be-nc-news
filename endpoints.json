@@ -2,18 +2,6 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
-  "GET /api/topics": {
-    "description": "serves an array of all topics",
-    "queries": [],
-    "exampleResponse": {
-      "topics": [
-        {
-          "slug": "football",
-          "description": "Footie!"
-          }
-        ]
-    }
-  },
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": ["topic", "sort_by", "order", "limit", "p", "total_count"],
@@ -148,6 +136,34 @@
     "description": "deletes a comment with the provided comment id",
     "queries": [],
     "exampleResponse": null
+  },
+  "GET /api/topics": {
+    "description": "serves an array of all topics",
+    "queries": [],
+    "exampleResponse": {
+      "topics": [
+        {
+          "slug": "football",
+          "description": "Footie!"
+          }
+        ]
+    }
+  },
+  "POST /api/topics": {
+    "description": "creates and serves a new topic",
+    "queries": [],
+    "requestBodyFormat": {
+      "slug": "philosophy",
+      "description": "'A route of many roads leading from nowhere to nothing.' -Ambrose Bierce"
+    },
+    "exampleResponse": {
+      "topics": [
+        {
+          "slug": "philosophy",
+          "description": "'A route of many roads leading from nowhere to nothing.' -Ambrose Bierce"
+          }
+        ]
+    }
   },
   "GET /api/users": {
     "description": "serves an array of all users",
