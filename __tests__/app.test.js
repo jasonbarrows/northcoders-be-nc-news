@@ -237,21 +237,24 @@ describe('GET /api/articles', () => {
         });
     });
 
+    it('200: responds with an empty array when page is out of range', () => {
+      return request(app)
+        .get('/api/articles?p=99')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeInstanceOf(Array);
+          expect(articles).toHaveLength(0);
+        });
+    });
+
     it('400: responds with bad request when page is not a number', () => {
       return request(app)
         .get('/api/articles?p=banana')
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe('Bad request');
-        });
-    });
-
-    it('404: responds with not found when page is out of bounds', () => {
-      return request(app)
-        .get('/api/articles?p=99')
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.message).toBe('Not found');
         });
     });
   });

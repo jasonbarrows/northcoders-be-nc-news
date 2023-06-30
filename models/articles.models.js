@@ -73,10 +73,6 @@ exports.selectAllArticles = ({
   }
 
   return Promise.all(promises).then((result) => {
-    if (result.length === 1 && result[0].rows.length === 0) {
-      return Promise.reject({ status: 404, message: 'Not found'});
-    }
-
     return result[0].rows
   });
 };
