@@ -180,6 +180,174 @@ describe('GET /api/articles', () => {
   });
 });
 
+describe('POST /api/articles', () => {
+  it('201: should add a new article and respond with the newly added article', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      title: 'New article title',
+      body: 'New article body',
+      topic: 'mitch',
+      article_img_url: 'New article image URL',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(201)
+      .then(({ body }) => {
+        const newArticle = body.article;
+
+        expect(newArticle).toMatchObject({
+          ...testBody,
+          article_id: expect.any(Number),
+          votes: 0,
+          created_at: expect.any(String),
+          comment_count: 0,
+        });
+      });
+  });
+
+  it('201: article_image_url is optional', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      title: 'New article title',
+      body: 'New article body',
+      topic: 'mitch',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(201)
+      .then(({ body }) => {
+        const newArticle = body.article;
+
+        expect(newArticle.article_img_url).toBe(
+          'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700'
+        );
+      });
+  });
+
+  it('201: ignores additional properties passed in the request body', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      title: 'New article title',
+      body: 'New article body',
+      topic: 'mitch',
+      votes: 100,
+      foo: 'bar',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(201)
+      .then(({ body }) => {
+        const newArticle = body.article;
+        expect(newArticle.votes).not.toBe(100);
+        expect(newArticle).not.toHaveProperty('foo');
+      });
+  });
+
+  test('400: an author property is required', () => {
+    const testBody = {
+      title: 'New article title',
+      body: 'New article body',
+      topic: 'mitch',
+    };
+
+    return request(app)
+    .post('/api/articles')
+    .send(testBody)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe('Bad request');
+    });
+  });
+
+  it('400: an author must be the username of a valid user', () => {
+    const testBody = {
+      author: 'not-a-user',
+      title: 'New article title',
+      body: 'New article body',
+      topic: 'mitch',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+
+  test('400: a title property is required', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      body: 'New article body',
+      topic: 'mitch',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+
+  test('400: a body property is required', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      title: 'New article title',
+      topic: 'mitch',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+
+  test('400: a topic property is required', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      title: 'New article title',
+      body: 'New article body',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+
+  test('400: a topic must be a valid topic', () => {
+    const testBody = {
+      author: 'butter_bridge',
+      title: 'New article title',
+      body: 'New article body',
+      topic: 'not-a-topic',
+    };
+
+    return request(app)
+      .post('/api/articles')
+      .send(testBody)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+});
+
 describe('GET /api/articles/:article_id', () => {
   it('200: responds with an article object when given a valid article id', () => {
     return request(app)
