@@ -73,10 +73,6 @@ exports.selectAllArticles = ({
   }
 
   return Promise.all(promises).then((result) => {
-    if (result.length === 1 && result[0].rows.length === 0) {
-      return Promise.reject({ status: 404, message: 'Not found'});
-    }
-
     return result[0].rows
   });
 };
@@ -97,15 +93,26 @@ exports.selectArticleById = (article_id) => {
   });
 };
 
-exports.selectAllCommentsByArticleId = (article_id) => {
+exports.selectAllCommentsByArticleId = (article_id, { limit = 10, p: page }) => {
+  if (limit % 1 !== 0) {
+    return Promise.reject({ status: 400, message: 'Invalid limit query' });
+  }
+
+  const queryValues = [ article_id ];
+  let queryStr = `SELECT c.* FROM comments c JOIN articles a ON a.article_id = c.article_id WHERE a.article_id = $1 ORDER BY created_at DESC`;
+
+  if (limit) {
+    queryValues.push(limit);
+    queryStr += ` LIMIT $${queryValues.length}`;
+  }
+
+  if (page) {
+    queryValues.push((page - 1) * limit);
+    queryStr += ` OFFSET $${queryValues.length}`;
+  }
+
   return Promise.all([
-    db.query(
-      `SELECT c.* FROM comments c
-      JOIN articles a ON a.article_id = c.article_id
-      WHERE a.article_id = $1;`, [
-        article_id,
-      ]
-    ),
+    db.query(queryStr, queryValues),
     this.selectArticleById(article_id),
   ]).then(([result]) => {
     return result.rows;

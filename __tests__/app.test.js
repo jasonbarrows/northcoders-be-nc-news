@@ -237,21 +237,24 @@ describe('GET /api/articles', () => {
         });
     });
 
+    it('200: responds with an empty array when page is out of range', () => {
+      return request(app)
+        .get('/api/articles?p=99')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles).toBeInstanceOf(Array);
+          expect(articles).toHaveLength(0);
+        });
+    });
+
     it('400: responds with bad request when page is not a number', () => {
       return request(app)
         .get('/api/articles?p=banana')
         .expect(400)
         .then(({ body }) => {
           expect(body.message).toBe('Bad request');
-        });
-    });
-
-    it('404: responds with not found when page is out of bounds', () => {
-      return request(app)
-        .get('/api/articles?p=99')
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.message).toBe('Not found');
         });
     });
   });
@@ -469,15 +472,6 @@ describe('GET /api/articles/:article_id', () => {
       });
   });
 
-  it('404: responds with not found message when given a valid article id that does not exist', () => {
-    return request(app)
-      .get('/api/articles/9999')
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request message when given an invalid article id', () => {
     return request(app)
       .get('/api/articles/not-an-article-id')
@@ -486,10 +480,19 @@ describe('GET /api/articles/:article_id', () => {
         expect(body.message).toBe('Bad request');
       });
   });
+
+  it('404: responds with not found message when given a valid article id that does not exist', () => {
+    return request(app)
+      .get('/api/articles/9999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
+  });
 });
 
 describe('GET /api/articles/:article_id/comments', () => {
-  it('200: responds with all comments when given a valid article id', () => {
+  it('200: responds with all comments when given a valid article id ordered by created_at in descending order', () => {
     return request(app)
       .get('/api/articles/1/comments')
       .expect(200)
@@ -497,7 +500,7 @@ describe('GET /api/articles/:article_id/comments', () => {
         const { comments } = body;
 
         expect(comments).toBeInstanceOf(Array);
-        expect(comments).toHaveLength(11);
+        expect(comments.length).toBeGreaterThan(1);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -508,6 +511,7 @@ describe('GET /api/articles/:article_id/comments', () => {
             created_at: expect.any(String),
           });
         });
+        expect(comments).toBeSortedBy('created_at', { descending: true });
       });
   });
 
@@ -523,6 +527,15 @@ describe('GET /api/articles/:article_id/comments', () => {
       });
   });
 
+  it('400: responds with bad request when given an invalid article id', () => {
+    return request(app)
+      .get('/api/articles/not-an-article-id/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+
   it('404: responds with not found when given a valid article id that does not exist', () => {
     return request(app)
       .get('/api/articles/9999/comments')
@@ -532,13 +545,84 @@ describe('GET /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('400: responds with bad request when given an invalid article id', () => {
-    return request(app)
-      .get('/api/articles/not-an-article-id/comments')
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe('Bad request');
-      });
+  describe('?limit', () => {
+    it('200: responds with an array of articles limited to the length of limit', () => {
+      return request(app)
+        .get('/api/articles/1/comments?limit=5')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(5);
+        });
+    });
+
+    it('200: responds with an array of 10 articles by default when not specifically assigned a value', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(10);
+        });
+    });
+
+    it('400: responds with invalid limit query for an invalid limit query', () => {
+      return request(app)
+        .get('/api/articles/1/comments?limit=not-an-integer')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe('Invalid limit query');
+        });
+    });
+  });
+
+  describe('?p', () => {
+    it('200: responds with an array of articles starting at page 1 of n pages', () => {
+      return request(app)
+        .get('/api/articles/1/comments?p=1')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(10);
+
+          const commentIds = comments.map((comment) => comment.comment_id)
+          expect(commentIds).toEqual([5, 2, 18, 13, 7, 8, 6, 12, 3, 4]);
+        });
+    });
+
+    it('200: responds with an array of articles starting at page 2 of n pages', () => {
+      return request(app)
+        .get('/api/articles/1/comments?p=2')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(1);
+
+          const commentIds = comments.map((comment) => comment.comment_id)
+          expect(commentIds).toEqual([9]);
+        });
+    });
+
+    it('200: responds with an empty array when page is out of range', () => {
+      return request(app)
+        .get('/api/articles/1/comments?p=99')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          expect(comments).toBeInstanceOf(Array);
+          expect(comments).toHaveLength(0);
+        });
+    });
+
+    it('400: responds with bad request when page is not a number', () => {
+      return request(app)
+        .get('/api/articles/1/comments?p=banana')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).toBe('Bad request');
+        });
+    });
   });
 });
 
@@ -630,21 +714,6 @@ describe('POST /api/articles/:article_id/comments', () => {
       });
   });
 
-  it('404: responds with not found when given a valid article id that does not exist', () => {
-    const testNewComment = {
-      username: 'butter_bridge',
-      body: 'This is a test comment body.',
-    };
-
-    return request(app)
-      .post('/api/articles/9999/comments')
-      .send(testNewComment)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid article id', () => {
     const testNewComment = {
       username: 'butter_bridge',
@@ -657,6 +726,21 @@ describe('POST /api/articles/:article_id/comments', () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    const testNewComment = {
+      username: 'butter_bridge',
+      body: 'This is a test comment body.',
+    };
+
+    return request(app)
+      .post('/api/articles/9999/comments')
+      .send(testNewComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
       });
   });
 });
@@ -729,18 +813,6 @@ describe('PATCH /api/articles/:article_id', () => {
     });
   });
 
-  it('404: responds with not found when given a valid article id that does not exist', () => {
-    const testBody = { inc_votes: 1 };
-
-    return request(app)
-      .patch('/api/articles/9999')
-      .send(testBody)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid article id', () => {
     const testBody = { inc_votes: 1 };
 
@@ -751,6 +823,18 @@ describe('PATCH /api/articles/:article_id', () => {
     .then(({ body }) => {
       expect(body.message).toBe('Bad request');
     });
+  });
+
+  it('404: responds with not found when given a valid article id that does not exist', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/articles/9999')
+      .send(testBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
   });
 });
 
@@ -823,18 +907,6 @@ describe('PATCH /api/comments/:comment_id', () => {
     });
   });
 
-  it('404: responds with not found when given a valid comment id that does not exist', () => {
-    const testBody = { inc_votes: 1 };
-
-    return request(app)
-      .patch('/api/comments/9999')
-      .send(testBody)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: responds with bad request when given an invalid comment id', () => {
     const testBody = { inc_votes: 1 };
 
@@ -846,6 +918,18 @@ describe('PATCH /api/comments/:comment_id', () => {
       expect(body.message).toBe('Bad request');
     });
   });
+
+  it('404: responds with not found when given a valid comment id that does not exist', () => {
+    const testBody = { inc_votes: 1 };
+
+    return request(app)
+      .patch('/api/comments/9999')
+      .send(testBody)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
+  });
 });
 
 describe('DELETE /api/comments/:comment_id', () => {
@@ -855,21 +939,21 @@ describe('DELETE /api/comments/:comment_id', () => {
       .expect(204);
   });
 
-  it('404: should return not found if the comment id is valid but does not exist', () => {
-    return request(app)
-      .delete('/api/comments/999')
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe('Not found');
-      });
-  });
-
   it('400: should return bad request when given an invalid comment id', () => {
     return request(app)
       .delete('/api/comments/not-a-valid-id')
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: should return not found if the comment id is valid but does not exist', () => {
+    return request(app)
+      .delete('/api/comments/999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
       });
   });
 });
