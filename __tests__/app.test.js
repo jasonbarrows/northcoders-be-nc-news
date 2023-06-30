@@ -564,6 +564,32 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
+describe('DELETE /api/articles/:article_id', () => {
+  it('204: should delete the article with the given article id', () => {
+    return request(app)
+      .delete('/api/articles/1')
+      .expect(204);
+  });
+
+  it('400: should return bad request when given an invalid article id', () => {
+    return request(app)
+      .delete('/api/articles/not-an-id')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe('Bad request');
+      });
+  });
+
+  it('404: should return not found if the article id is valid but does not exist', () => {
+    return request(app)
+      .delete('/api/articles/9999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe('Not found');
+      });
+  });
+});
+
 describe('GET /api/articles/:article_id/comments', () => {
   it('200: responds with all comments when given a valid article id ordered by created_at in descending order', () => {
     return request(app)

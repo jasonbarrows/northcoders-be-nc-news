@@ -81,6 +81,11 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes an article with the provided article id",
+    "queries": [],
+    "exampleResponse": null
+  },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of all comments for the provided article id",
     "queries": ["limit", "p"],
