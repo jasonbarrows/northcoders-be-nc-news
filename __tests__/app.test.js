@@ -225,7 +225,7 @@ describe('GET /api/articles/:article_id', () => {
       .get('/api/articles/not-an-article-id')
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 });
@@ -279,7 +279,7 @@ describe('GET /api/articles/:article_id/comments', () => {
       .get('/api/articles/not-an-article-id/comments')
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 });
@@ -339,7 +339,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       .send(testNewComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 
@@ -354,7 +354,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       .send(testNewComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 
@@ -368,7 +368,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       .send(testNewComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 
@@ -398,7 +398,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       .send(testNewComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 });
@@ -455,7 +455,7 @@ describe('PATCH /api/articles/:article_id', () => {
       .send(testBody)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 
@@ -467,7 +467,7 @@ describe('PATCH /api/articles/:article_id', () => {
     .send(testBody)
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe('Bad Request');
+      expect(body.message).toBe('Bad request');
     });
   });
 
@@ -491,7 +491,7 @@ describe('PATCH /api/articles/:article_id', () => {
     .send(testBody)
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe('Bad Request');
+      expect(body.message).toBe('Bad request');
     });
   });
 });
@@ -549,7 +549,7 @@ describe('PATCH /api/comments/:comment_id', () => {
       .send(testBody)
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 
@@ -561,7 +561,7 @@ describe('PATCH /api/comments/:comment_id', () => {
     .send(testBody)
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe('Bad Request');
+      expect(body.message).toBe('Bad request');
     });
   });
 
@@ -585,7 +585,7 @@ describe('PATCH /api/comments/:comment_id', () => {
     .send(testBody)
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe('Bad Request');
+      expect(body.message).toBe('Bad request');
     });
   });
 });
@@ -611,7 +611,7 @@ describe('DELETE /api/comments/:comment_id', () => {
       .delete('/api/comments/not-a-valid-id')
       .expect(400)
       .then(({ body }) => {
-        expect(body.message).toBe('Bad Request');
+        expect(body.message).toBe('Bad request');
       });
   });
 });
